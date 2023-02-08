@@ -22,78 +22,103 @@ A text field where users enter a number.
 A text view showing the result of the conversion.
 */
 import SwiftUI
-
-struct ContentView: View {
-    @State private var unitValue = 0.0
-    @State private var physicalUnits = ["Temperature","Distance","Time","Volume"]
-    @State private var selectedUnit = "Temperature"
+struct UnitConverter{
+    var physicalUnits:[String] = ["Temperature","Distance"]
+    var physicalUnitMeasures:[String:[String]] = ["Temperature":["Celsius","Farenheit","Kelvin"],
+                                                  "Distance":["Meters","Kilometers","Miles"]]
     
-    
-    @State private var physicalUnitMeasures:[String: [String]] = [
-        "Temperature":["Celsius","Farenheit","Kelvin"],
-        "Distance":["Meters","Kilometers","Miles"]
-    ]
-    
-    @State private var selectedMeasureToConvertFrom = "Celsius"
-    @State private var selectedMeasureToConvertTo = "Farenheit"
-    
-    var convertedUnits:Double{
-        //Temperature
-        if selectedMeasureToConvertFrom == "Celsius" && selectedMeasureToConvertTo == "Farenheit" {
-            
-             return unitValue * 9/5 + 32
-        }
-        else if  selectedMeasureToConvertFrom == "Celsius" && selectedMeasureToConvertTo == "Kelvin"{
-            
-            return unitValue + 273.15
-        }
-        else if selectedMeasureToConvertFrom == "Farenheit" && selectedMeasureToConvertTo == "Celsius"{
-            
-            return (unitValue - 32) * 5/9
-        }
-        else if selectedMeasureToConvertFrom == "Farenheit" && selectedMeasureToConvertTo == "Kelvin"{
-            
-            return (unitValue + 459.67) * 5/9
-        }
-        else if selectedMeasureToConvertFrom == "Kelvin" && selectedMeasureToConvertTo == "Celcius"{
-            
-            return unitValue - 273.15
-        }
-        else if selectedMeasureToConvertFrom == "Kelvin" && selectedMeasureToConvertTo == "Farenheit"{
-            
-            return (unitValue - 273.15) * 9/5 + 32
-            
-        }
-        //Distance
-        else if selectedMeasureToConvertFrom == "Meters" && selectedMeasureToConvertTo == "Kilometers"{
-
-            return unitValue/1000
-        }
+    func selectPhysicalUnit(index:Int)->String{
         
-        else if selectedMeasureToConvertFrom == "Meters" && selectedMeasureToConvertTo == "Miles"{
+        return physicalUnits[index]
+    }
+    
+    func selectUnitToConvert(index:Int,measure:Int)->String{
+        
+        return physicalUnitMeasures[physicalUnits[index]]?[measure] ?? "Temperature"
+    }
+    
+    func convert(units:Double,convertFrom:String,convertTo:String)->Double{
+            //Temperature
+            if convertFrom == "Celsius" && convertTo == "Farenheit" {
 
-            return unitValue / 1609
+                 return units * 9/5 + 32
+            }
+            else if convertFrom == "Celsius" && convertTo == "Kelvin"{
+
+                return units + 273.15
+            }
+            else if convertFrom == "Farenheit" && convertTo == "Celsius"{
+
+                return (units - 32) * 5/9
+            }
+            else if convertFrom == "Farenheit" && convertTo == "Kelvin"{
+
+                return (units + 459.67) * 5/9
+            }
+            else if convertFrom == "Kelvin" && convertTo == "Celcius"{
+
+                return units - 273.15
+            }
+            else if convertFrom == "Kelvin" && convertTo == "Farenheit"{
+
+                return (units - 273.15) * 9/5 + 32
+
+            }
+            //Distance
+            else if convertFrom == "Meters" && convertTo == "Kilometers"{
+
+                return units/1000
+            }
+
+            else if convertFrom == "Meters" && convertTo == "Miles"{
+
+                return units / 1609
+            }
+            else if convertFrom == "Kilometers" && convertTo == "Meters"{
+
+                return units * 1000
+            }
+
+            else if convertFrom == "Kilometers" && convertTo == "Miles"{
+
+                return units / 1.609
+            }
+            else if convertFrom == "Miles" && convertTo == "Meters"{
+
+                return units * 1609
+            }
+            else if convertFrom == "Miles" && convertTo == "Kilometers"{
+
+                return units * 1.609
+
+            }
+
+            return units
         }
-        else if selectedMeasureToConvertFrom == "Kilometers" && selectedMeasureToConvertTo == "Meters"{
-
-            return unitValue * 1000
-        }
-       
-        else if selectedMeasureToConvertFrom == "Kilometers" && selectedMeasureToConvertTo == "Miles"{
-
-            return unitValue / 1.609
-        }
-        else if selectedMeasureToConvertFrom == "Miles" && selectedMeasureToConvertTo == "Meters"{
-
-            return unitValue * 1609
-        }
-        else if selectedMeasureToConvertFrom == "Miles" && selectedMeasureToConvertTo == "Kilometers"{
-            
-            return unitValue * 1.609
-
-        }
-
-        return 0
+}
+struct ContentView: View {
+    @State var convertedUnits:Double = 0.0
+    
+    @State private var unitValue = 300.0
+    @State private var physicalUnits:[String] = []
+    @State private var physicalUnitMeasures:[String: [String]] = [:]
+    @State private var selectedUnit:String=""
+    @State private var selectedMeasureToConvertFrom:String=""
+    @State private var selectedMeasureToConvertTo:String=""
+    var converter:UnitConverter
+    init(converter:UnitConverter){
+       //converter = UnitConverter()
+        self.converter = converter
+        
+    }
+    
+    func populateContentView(){
+        physicalUnits = converter.physicalUnits
+        physicalUnitMeasures = converter.physicalUnitMeasures
+        selectedUnit = converter.selectPhysicalUnit(index: 0)
+        selectedMeasureToConvertFrom = converter.selectUnitToConvert(index: 0, measure: 0)
+        selectedMeasureToConvertTo = converter.selectUnitToConvert(index: 0, measure: 1)
+        convertedUnits = converter.convert(units: unitValue, convertFrom: selectedMeasureToConvertFrom, convertTo: selectedMeasureToConvertTo)
     }
     var body: some View {
         NavigationView{
@@ -141,12 +166,14 @@ struct ContentView: View {
 
                 }.navigationTitle("Unit Converter")
             }
+        .onAppear{populateContentView()}
         }
+        
         
     }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(converter: UnitConverter())
     }
 }
