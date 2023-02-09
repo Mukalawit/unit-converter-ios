@@ -22,158 +22,285 @@ A text field where users enter a number.
 A text view showing the result of the conversion.
 */
 import SwiftUI
-struct UnitConverter{
-    var physicalUnits:[String] = ["Temperature","Distance"]
-    var physicalUnitMeasures:[String:[String]] = ["Temperature":["Celsius","Farenheit","Kelvin"],
-                                                  "Distance":["Meters","Kilometers","Miles"]]
-    
-    func selectPhysicalUnit(index:Int)->String{
-        
-        return physicalUnits[index]
+
+class PhysicalUnits:ObservableObject{
+    @Published var unitValue:Double = 0
+    @Published var selectedUnit:String = "Temperature"
+    @Published var selectedMeasureToConvertFrom:String = "Celcius"
+    @Published var selectedMeasureToConvertTo:String = "Kelvin"
+    var conversionResult:Double{
+        get{
+           
+           converter(unitValue: unitValue, convertFrom: selectedMeasureToConvertFrom, ConvertTo: selectedMeasureToConvertTo)
+        }
+
     }
-    
-    func selectUnitToConvert(index:Int,measure:Int)->String{
+
+    enum Units:String,CaseIterable{
+        case temperature = "Temperature"
+        case distance = "Distance"
+       
+        struct Temperature{
+            enum UnitMeasures:String,CaseIterable{
+                case celcius = "Celcius"
+                case farenheit = "Farenheit"
+                case kelvin = "Kelvin"
+            }
+            
+            struct Celcius{
+                var temperature:Double
+                
+                init(fromFarenheit unitValue:Double){
+                    temperature = (unitValue - 32)/1.8
+                }
+                
+                init(fromKelvin unitValue:Double){
+                    temperature = unitValue - 273.15
+                }
+            }
+            
+            struct Farenheit{
+                var temperature:Double
+                
+                init(fromCelcius unitValue:Double){
+                    temperature = unitValue * 9/5 + 32
+                }
+                
+                init(fromKelvin unitValue:Double){
+                    temperature = (unitValue - 273.15)*9/5 + 32
+                }
+            }
+            
+            struct Kelvin{
+                var temperature:Double
+                
+                init(fromCelcius unitValue:Double){
+                    temperature = unitValue + 273.15
+                }
+                
+                init(fromFarenheit unitValue:Double){
+                    temperature = (unitValue + 459.67)*5/9
+                }
+                
+            }
+        }
         
-        return physicalUnitMeasures[physicalUnits[index]]?[measure] ?? "Temperature"
+        struct Distance{
+            enum UnitMeasures:String,CaseIterable{
+                case meters = "Meters"
+                case kilometers = "Kilometers"
+                case miles = "Miles"
+            }
+            
+            struct Meters{
+                var distance:Double
+                
+                init(fromKilometers unitValue:Double){
+                    distance = unitValue*1000
+                }
+                
+                init(fromMiles unitValue:Double){
+                    distance = unitValue*1609
+                }
+            }
+            
+            struct Kilometers{
+                var distance:Double
+                
+                init(fromMeters unitValue:Double){
+                    distance = unitValue/1000
+                }
+                
+                init(fromMiles unitValue:Double){
+                    distance = unitValue*1.609
+                }
+            }
+            
+            struct Miles{
+                var distance:Double
+                
+                init(fromMeters unitValue:Double){
+                    distance = unitValue/1609
+                }
+                
+                init(fromKilometers unitValue:Double){
+                    distance = unitValue/1.609
+                }
+            }
+        }
     }
-    
-    func convert(units:Double,convertFrom:String,convertTo:String)->Double{
-            //Temperature
-            if convertFrom == "Celsius" && convertTo == "Farenheit" {
 
-                 return units * 9/5 + 32
+        func converter(unitValue:Double,convertFrom:String,ConvertTo:String)->Double{
+        //Temperature
+            if selectedMeasureToConvertFrom == "Celsius" && selectedMeasureToConvertTo == "Farenheit" {
+                
+                let result = PhysicalUnits.Units.Temperature.Farenheit(fromCelcius: unitValue)
+                
+               return result.temperature
             }
-            else if convertFrom == "Celsius" && convertTo == "Kelvin"{
-
-                return units + 273.15
+            else if  selectedMeasureToConvertFrom == "Celsius" && selectedMeasureToConvertTo == "Kelvin"{
+                
+                let result = PhysicalUnits.Units.Temperature.Kelvin(fromCelcius: unitValue)
+               return  result.temperature
             }
-            else if convertFrom == "Farenheit" && convertTo == "Celsius"{
-
-                return (units - 32) * 5/9
+            else if selectedMeasureToConvertFrom == "Farenheit" && selectedMeasureToConvertTo == "Celsius"{
+                
+                let result = PhysicalUnits.Units.Temperature.Celcius(fromFarenheit: unitValue)
+                
+                return result.temperature
             }
-            else if convertFrom == "Farenheit" && convertTo == "Kelvin"{
-
-                return (units + 459.67) * 5/9
+            else if selectedMeasureToConvertFrom == "Farenheit" && selectedMeasureToConvertTo == "Kelvin"{
+                
+                let result = PhysicalUnits.Units.Temperature.Kelvin(fromFarenheit: unitValue)
+                return result.temperature
             }
-            else if convertFrom == "Kelvin" && convertTo == "Celcius"{
-
-                return units - 273.15
+            else if selectedMeasureToConvertFrom == "Kelvin" && selectedMeasureToConvertTo == "Celcius"{
+                
+                let result = PhysicalUnits.Units.Temperature.Celcius(fromKelvin: unitValue)
+                
+                return result.temperature
             }
-            else if convertFrom == "Kelvin" && convertTo == "Farenheit"{
-
-                return (units - 273.15) * 9/5 + 32
-
+            else if selectedMeasureToConvertFrom == "Kelvin" && selectedMeasureToConvertTo == "Farenheit"{
+                
+                let result = PhysicalUnits.Units.Temperature.Farenheit(fromKelvin: unitValue)
+                
+                return result.temperature
+                
             }
             //Distance
-            else if convertFrom == "Meters" && convertTo == "Kilometers"{
+            else if selectedMeasureToConvertFrom == "Meters" && selectedMeasureToConvertTo == "Kilometers"{
 
-                return units/1000
+                let result = PhysicalUnits.Units.Distance.Kilometers(fromMeters: unitValue)
+                
+                return result.distance
+                
             }
+            
+            else if selectedMeasureToConvertFrom == "Meters" && selectedMeasureToConvertTo == "Miles"{
 
-            else if convertFrom == "Meters" && convertTo == "Miles"{
-
-                return units / 1609
+                let result = PhysicalUnits.Units.Distance.Miles(fromMeters: unitValue)
+                
+                return result.distance
             }
-            else if convertFrom == "Kilometers" && convertTo == "Meters"{
+            else if selectedMeasureToConvertFrom == "Kilometers" && selectedMeasureToConvertTo == "Meters"{
 
-                return units * 1000
+                let result = PhysicalUnits.Units.Distance.Meters(fromKilometers: unitValue)
+                
+                return result.distance
             }
-
-            else if convertFrom == "Kilometers" && convertTo == "Miles"{
-
-                return units / 1.609
+           
+            else if selectedMeasureToConvertFrom == "Kilometers" && selectedMeasureToConvertTo == "Miles"{
+                
+                let result = PhysicalUnits.Units.Distance.Miles(fromKilometers: unitValue)
+                
+                return result.distance
+                 
             }
-            else if convertFrom == "Miles" && convertTo == "Meters"{
+            else if selectedMeasureToConvertFrom == "Miles" && selectedMeasureToConvertTo == "Meters"{
 
-                return units * 1609
+                let result = PhysicalUnits.Units.Distance.Meters(fromMiles: unitValue)
+                
+                return result.distance
             }
-            else if convertFrom == "Miles" && convertTo == "Kilometers"{
-
-                return units * 1.609
+            else if selectedMeasureToConvertFrom == "Miles" && selectedMeasureToConvertTo == "Kilometers"{
+                
+                let result = PhysicalUnits.Units.Distance.Kilometers(fromMiles: unitValue)
+                
+                return result.distance
 
             }
-
-            return units
+        else{
+            return unitValue
         }
-}
-struct ContentView: View {
-    @State var convertedUnits:Double = 0.0
-    
-    @State private var unitValue = 300.0
-    @State private var physicalUnits:[String] = []
-    @State private var physicalUnitMeasures:[String: [String]] = [:]
-    @State private var selectedUnit:String=""
-    @State private var selectedMeasureToConvertFrom:String=""
-    @State private var selectedMeasureToConvertTo:String=""
-    var converter:UnitConverter
-    init(converter:UnitConverter){
-       //converter = UnitConverter()
-        self.converter = converter
         
     }
-    
-    func populateContentView(){
-        physicalUnits = converter.physicalUnits
-        physicalUnitMeasures = converter.physicalUnitMeasures
-        selectedUnit = converter.selectPhysicalUnit(index: 0)
-        selectedMeasureToConvertFrom = converter.selectUnitToConvert(index: 0, measure: 0)
-        selectedMeasureToConvertTo = converter.selectUnitToConvert(index: 0, measure: 1)
-        convertedUnits = converter.convert(units: unitValue, convertFrom: selectedMeasureToConvertFrom, convertTo: selectedMeasureToConvertTo)
-    }
+}
+
+
+struct ContentView: View {
+    @ObservedObject var physicalUnits = PhysicalUnits()
     var body: some View {
         NavigationView{
             Form{
                 Section{
-                    Picker("Conversion", selection: $selectedUnit){
-                        ForEach(physicalUnits,id: \.self){
-                            Text("\($0)")
+                    Picker("Conversion", selection: $physicalUnits.selectedUnit){
+                        ForEach(PhysicalUnits.Units.allCases,id: \.rawValue){ unit in
+                            Text(unit.rawValue)
                         }
                     }
+                    
                 }header:{
                     Text("Please select the physical unit")
                 }
                 
                 Section{
-                    TextField("Unit Value",value:$unitValue , format:.number)
-                    Picker("Convert from", selection: $selectedMeasureToConvertFrom){
-                        
-                        ForEach(physicalUnitMeasures[selectedUnit] ?? ["N/A"],id:\.self){
-                            Text("\($0)")
+                    TextField("Unit Value",value:$physicalUnits.unitValue , format:.number)
+
+                    switch physicalUnits.selectedUnit{
+                    case "Temperature":
+                        Picker("Convert from", selection: $physicalUnits.selectedMeasureToConvertFrom){
+                            ForEach(PhysicalUnits.Units.Temperature.UnitMeasures.allCases,id: \.rawValue){ unit in
+                                Text(unit.rawValue)
+                            }
+                        }
+                    case "Distance":
+                        Picker("Convert from", selection: $physicalUnits.selectedMeasureToConvertFrom){
+                            ForEach(PhysicalUnits.Units.Distance.UnitMeasures.allCases,id: \.rawValue){ unit in
+                                Text(unit.rawValue)
+                            }
+                        }
+                    default:
+                        Picker("Convert from", selection: $physicalUnits.selectedMeasureToConvertFrom){
+                            ForEach(PhysicalUnits.Units.Temperature.UnitMeasures.allCases,id: \.rawValue){ unit in
+                                Text(unit.rawValue)
+                            }
                         }
                     }
-                        
+
                 }header:{
                     Text("Enter the measure to be converted")
                 }
+
+                Section{
+                    switch physicalUnits.selectedUnit{
+                    case "Temperature":
+                        Picker("Convert to", selection: $physicalUnits.selectedMeasureToConvertTo){
+                            ForEach(PhysicalUnits.Units.Temperature.UnitMeasures.allCases,id: \.rawValue){ unit in
+                                Text(unit.rawValue)
+                            }
+                        }
+                    case "Distance":
+                        Picker("Convert to", selection: $physicalUnits.selectedMeasureToConvertTo){
+                            ForEach(PhysicalUnits.Units.Distance.UnitMeasures.allCases,id: \.rawValue){ unit in
+                                Text(unit.rawValue)
+                            }
+                        }
+                    default:
+                        Picker("Convert to", selection: $physicalUnits.selectedMeasureToConvertTo){
+                            ForEach(PhysicalUnits.Units.Temperature.UnitMeasures.allCases,id: \.rawValue){ unit in
+                                Text(unit.rawValue)
+                            }
+                        }
+                    }
+
+                }
                 
                 Section{
-                    Picker("Convert to", selection: $selectedMeasureToConvertTo){
-                        ForEach(physicalUnitMeasures[selectedUnit] ?? ["N/A"],id:\.self){
-                            Text("\($0)")
-                        }
-                        
-                        
-                    }
-                    
-                        
-                }
-                Section{
-                    Text(convertedUnits,format:.number)
+                    Text(physicalUnits.conversionResult,format:.number)
                 }header:{
                     Text("Answer")
                 }
+                .navigationTitle("Unit Converter")
                 
-
-                }.navigationTitle("Unit Converter")
             }
-        .onAppear{populateContentView()}
+            
         }
         
-        
     }
+}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(converter: UnitConverter())
+        ContentView()
     }
 }
