@@ -25,9 +25,10 @@ import SwiftUI
 
 class PhysicalUnits:ObservableObject{
     @Published var unitValue:Double = 0
-    @Published var selectedUnit:String = "Temperature"
-    @Published var selectedMeasureToConvertFrom:String = "Celcius"
-    @Published var selectedMeasureToConvertTo:String = "Kelvin"
+    @Published var selectedUnit:String = PhysicalUnits.Units.temperature.rawValue
+    @Published var selectedMeasureToConvertFrom:String = PhysicalUnits.Units.Temperature.UnitMeasures.celcius.rawValue
+    @Published var selectedMeasureToConvertTo:String = PhysicalUnits.Units.Temperature.UnitMeasures.kelvin.rawValue
+    
     var conversionResult:Double{
         get{
            
@@ -132,35 +133,35 @@ class PhysicalUnits:ObservableObject{
 
         func converter(unitValue:Double,convertFrom:String,ConvertTo:String)->Double{
         //Temperature
-            if selectedMeasureToConvertFrom == "Celsius" && selectedMeasureToConvertTo == "Farenheit" {
+            if selectedMeasureToConvertFrom == PhysicalUnits.Units.Temperature.UnitMeasures.celcius.rawValue && selectedMeasureToConvertTo == PhysicalUnits.Units.Temperature.UnitMeasures.farenheit.rawValue {
                 
                 let result = PhysicalUnits.Units.Temperature.Farenheit(fromCelcius: unitValue)
                 
                return result.temperature
             }
-            else if  selectedMeasureToConvertFrom == "Celsius" && selectedMeasureToConvertTo == "Kelvin"{
+            else if  selectedMeasureToConvertFrom == PhysicalUnits.Units.Temperature.UnitMeasures.celcius.rawValue && selectedMeasureToConvertTo == PhysicalUnits.Units.Temperature.UnitMeasures.kelvin.rawValue{
                 
                 let result = PhysicalUnits.Units.Temperature.Kelvin(fromCelcius: unitValue)
                return  result.temperature
             }
-            else if selectedMeasureToConvertFrom == "Farenheit" && selectedMeasureToConvertTo == "Celsius"{
+            else if selectedMeasureToConvertFrom == PhysicalUnits.Units.Temperature.UnitMeasures.farenheit.rawValue && selectedMeasureToConvertTo == PhysicalUnits.Units.Temperature.UnitMeasures.celcius.rawValue{
                 
                 let result = PhysicalUnits.Units.Temperature.Celcius(fromFarenheit: unitValue)
                 
                 return result.temperature
             }
-            else if selectedMeasureToConvertFrom == "Farenheit" && selectedMeasureToConvertTo == "Kelvin"{
+            else if selectedMeasureToConvertFrom == PhysicalUnits.Units.Temperature.UnitMeasures.farenheit.rawValue && selectedMeasureToConvertTo == PhysicalUnits.Units.Temperature.UnitMeasures.kelvin.rawValue{
                 
                 let result = PhysicalUnits.Units.Temperature.Kelvin(fromFarenheit: unitValue)
                 return result.temperature
             }
-            else if selectedMeasureToConvertFrom == "Kelvin" && selectedMeasureToConvertTo == "Celcius"{
+            else if selectedMeasureToConvertFrom == PhysicalUnits.Units.Temperature.UnitMeasures.kelvin.rawValue && selectedMeasureToConvertTo == PhysicalUnits.Units.Temperature.UnitMeasures.celcius.rawValue{
                 
                 let result = PhysicalUnits.Units.Temperature.Celcius(fromKelvin: unitValue)
                 
                 return result.temperature
             }
-            else if selectedMeasureToConvertFrom == "Kelvin" && selectedMeasureToConvertTo == "Farenheit"{
+            else if selectedMeasureToConvertFrom == PhysicalUnits.Units.Temperature.UnitMeasures.kelvin.rawValue && selectedMeasureToConvertTo == PhysicalUnits.Units.Temperature.UnitMeasures.farenheit.rawValue{
                 
                 let result = PhysicalUnits.Units.Temperature.Farenheit(fromKelvin: unitValue)
                 
@@ -168,7 +169,7 @@ class PhysicalUnits:ObservableObject{
                 
             }
             //Distance
-            else if selectedMeasureToConvertFrom == "Meters" && selectedMeasureToConvertTo == "Kilometers"{
+            else if selectedMeasureToConvertFrom == PhysicalUnits.Units.Distance.UnitMeasures.meters.rawValue && selectedMeasureToConvertTo == PhysicalUnits.Units.Distance.UnitMeasures.kilometers.rawValue{
 
                 let result = PhysicalUnits.Units.Distance.Kilometers(fromMeters: unitValue)
                 
@@ -176,33 +177,33 @@ class PhysicalUnits:ObservableObject{
                 
             }
             
-            else if selectedMeasureToConvertFrom == "Meters" && selectedMeasureToConvertTo == "Miles"{
+            else if selectedMeasureToConvertFrom == PhysicalUnits.Units.Distance.UnitMeasures.meters.rawValue && selectedMeasureToConvertTo == PhysicalUnits.Units.Distance.UnitMeasures.miles.rawValue{
 
                 let result = PhysicalUnits.Units.Distance.Miles(fromMeters: unitValue)
                 
                 return result.distance
             }
-            else if selectedMeasureToConvertFrom == "Kilometers" && selectedMeasureToConvertTo == "Meters"{
+            else if selectedMeasureToConvertFrom == PhysicalUnits.Units.Distance.UnitMeasures.kilometers.rawValue && selectedMeasureToConvertTo == PhysicalUnits.Units.Distance.UnitMeasures.meters.rawValue{
 
                 let result = PhysicalUnits.Units.Distance.Meters(fromKilometers: unitValue)
                 
                 return result.distance
             }
            
-            else if selectedMeasureToConvertFrom == "Kilometers" && selectedMeasureToConvertTo == "Miles"{
+            else if selectedMeasureToConvertFrom == PhysicalUnits.Units.Distance.UnitMeasures.kilometers.rawValue && selectedMeasureToConvertTo == PhysicalUnits.Units.Distance.UnitMeasures.miles.rawValue{
                 
                 let result = PhysicalUnits.Units.Distance.Miles(fromKilometers: unitValue)
                 
                 return result.distance
                  
             }
-            else if selectedMeasureToConvertFrom == "Miles" && selectedMeasureToConvertTo == "Meters"{
+            else if selectedMeasureToConvertFrom == PhysicalUnits.Units.Distance.UnitMeasures.miles.rawValue && selectedMeasureToConvertTo == PhysicalUnits.Units.Distance.UnitMeasures.meters.rawValue{
 
                 let result = PhysicalUnits.Units.Distance.Meters(fromMiles: unitValue)
                 
                 return result.distance
             }
-            else if selectedMeasureToConvertFrom == "Miles" && selectedMeasureToConvertTo == "Kilometers"{
+            else if selectedMeasureToConvertFrom == PhysicalUnits.Units.Distance.UnitMeasures.miles.rawValue && selectedMeasureToConvertTo == PhysicalUnits.Units.Distance.UnitMeasures.kilometers.rawValue{
                 
                 let result = PhysicalUnits.Units.Distance.Kilometers(fromMiles: unitValue)
                 
